@@ -61,6 +61,22 @@ class Quill {
     }
   }
 
+  getRootNode(options) {
+    options = Object.assign({ composed: false }, options);
+    let rootNode = document;
+    if (
+      options.composed === false &&
+      typeof HTMLElement.prototype.attachShadow === 'function'
+    ) {
+      let currentNode = this.root.parentNode;
+      while (!(currentNode === document || currentNode instanceof ShadowRoot)) {
+        currentNode = currentNode.parentNode;
+      }
+      rootNode = currentNode;
+    }
+    return rootNode;
+  }
+
   constructor(container, options = {}) {
     this.options = expandConfig(container, options);
     this.container = this.options.container;
@@ -78,7 +94,7 @@ class Quill {
     this.root.classList.add('ql-blank');
     this.root.setAttribute('data-gramm', false);
     this.scrollingContainer = this.options.scrollingContainer || this.root;
-    this.emitter = new Emitter();
+    this.emitter = new Emitter(this.getRootNode.bind(this)());
     const ScrollBlot = this.options.registry.query(
       Parchment.ScrollBlot.blotName,
     );
@@ -86,7 +102,11 @@ class Quill {
       emitter: this.emitter,
     });
     this.editor = new Editor(this.scroll);
-    this.selection = new Selection(this.scroll, this.emitter);
+    this.selection = new Selection(
+      this.scroll,
+      this.emitter,
+      this.getRootNode.bind(this)(),
+    );
     this.theme = new this.options.theme(this, this.options); // eslint-disable-line new-cap
     this.keyboard = this.theme.addModule('keyboard');
     this.clipboard = this.theme.addModule('clipboard');

@@ -14,8 +14,9 @@ class Range {
 }
 
 class Selection {
-  constructor(scroll, emitter) {
+  constructor(scroll, emitter, documentOrShadowRoot = document) {
     this.emitter = emitter;
+    this.documentOrShadowRoot = documentOrShadowRoot;
     this.scroll = scroll;
     this.composing = false;
     this.mouseDown = false;
@@ -175,7 +176,7 @@ class Selection {
   }
 
   getNativeRange() {
-    const selection = document.getSelection();
+    const selection = this.documentOrShadowRoot.getSelection();
     if (selection == null || selection.rangeCount <= 0) return null;
     const nativeRange = selection.getRangeAt(0);
     if (nativeRange == null) return null;
@@ -194,7 +195,7 @@ class Selection {
   hasFocus() {
     return (
       document.activeElement === this.root ||
-      contains(this.root, document.activeElement)
+      contains(this.root, this.documentOrShadowRoot.activeElement)
     );
   }
 
@@ -316,7 +317,7 @@ class Selection {
     ) {
       return;
     }
-    const selection = document.getSelection();
+    const selection = this.documentOrShadowRoot.getSelection();
     if (selection == null) return;
     if (startNode != null) {
       if (!this.hasFocus()) this.root.focus();

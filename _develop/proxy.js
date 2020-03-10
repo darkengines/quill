@@ -39,5 +39,5 @@ proxy.on('error', e => {
   console.error(e);
 });
 
-console.log('Proxy listening on ' + ports.proxy);
+console.log(`Proxy listening on ${ports.proxy}`);
 server.listen(ports.proxy);
