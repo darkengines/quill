@@ -5,24 +5,6 @@
   "author": "Jason Chen <jhchen7@gmail.com>",
   "homepage": "http://quilljs.com",
   "main": "dist/quill.js",
-  "files": [
-    "assets",
-    "blots",
-    "core",
-    "formats",
-    "modules",
-    "themes",
-    "ui",
-    "dist/quill.bubble.css",
-    "dist/quill.snow.css",
-    "dist/quill.core.css",
-    "dist/quill.js",
-    "dist/quill.core.js",
-    "dist/quill.min.js.map",
-    "dist/quill.min.js",
-    "core.js",
-    "quill.js"
-  ],
   "config": {
     "ports": {
       "proxy": "9000",
