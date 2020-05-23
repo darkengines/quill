@@ -176,7 +176,7 @@ class Selection {
   }
 
   getNativeRange() {
-    const selection = this.documentOrShadowRoot.getSelection();
+    const selection = this.documentOrShadowRoot.getSelection === undefined ? document.getSelection() : this.documentOrShadowRoot.getSelection();
     if (selection == null || selection.rangeCount <= 0) return null;
     const nativeRange = selection.getRangeAt(0);
     if (nativeRange == null) return null;
@@ -317,7 +317,7 @@ class Selection {
     ) {
       return;
     }
-    const selection = this.documentOrShadowRoot.getSelection();
+    const selection = this.documentOrShadowRoot.getSelection === undefined ? document.getSelection() : this.documentOrShadowRoot.getSelection();
     if (selection == null) return;
     if (startNode != null) {
       if (!this.hasFocus()) this.root.focus();
