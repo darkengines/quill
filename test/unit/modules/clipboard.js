@@ -34,6 +34,7 @@ describe('Clipboard', function() {
       it('pastes html data if present with file', function(done) {
         const upload = spyOn(this.quill.uploader, 'upload');
         this.quill.clipboard.onCapturePaste(
+          // eslint-disable-next-line prefer-object-spread
           Object.assign({}, this.clipboardEvent, { files: ['file '] }),
         );
         setTimeout(() => {
@@ -52,6 +53,33 @@ describe('Clipboard', function() {
         this.quill.clipboard.onCapturePaste(this.clipboardEvent);
         setTimeout(function() {
           expect(change).not.toHaveBeenCalled();
+          done();
+        }, 2);
+      });
+    });
+
+    describe('cut', () => {
+      beforeEach(function() {
+        this.clipboardData = {};
+        this.clipboardEvent = {
+          clipboardData: {
+            setData: (type, data) => {
+              this.clipboardData[type] = data;
+            },
+          },
+          preventDefault: () => {},
+        };
+      });
+
+      it('keeps formats of first line', function(done) {
+        this.quill.clipboard.onCaptureCopy(this.clipboardEvent, true);
+        setTimeout(() => {
+          expect(this.quill.root).toEqualHTML('<h1>01<em>7</em>8</h1>');
+          expect(this.quill.getSelection()).toEqual(new Range(2));
+          expect(this.clipboardData['text/plain']).toEqual('23\n56');
+          expect(this.clipboardData['text/html']).toEqual(
+            '<h1>23</h1><p>5<em>6</em></p>',
+          );
           done();
         }, 2);
       });
@@ -199,6 +227,20 @@ describe('Clipboard', function() {
           .insert('One\n', { list: 'bullet' })
           .insert('Alpha\nBeta\n', { list: 'bullet', indent: 1 })
           .insert('I\n', { list: 'bullet', indent: 2 }),
+      );
+    });
+
+    it('html nested checklist', function() {
+      const delta = this.clipboard.convert({
+        html:
+          '<ul><li data-list="checked">One<ul><li data-list="checked">Alpha</li><li data-list="checked">Beta' +
+          '<ul><li data-list="checked">I</li></ul></li></ul></li></ul>',
+      });
+      expect(delta).toEqual(
+        new Delta()
+          .insert('One\n', { list: 'checked' })
+          .insert('Alpha\nBeta\n', { list: 'checked', indent: 1 })
+          .insert('I\n', { list: 'checked', indent: 2 }),
       );
     });
 
